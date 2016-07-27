@@ -184,7 +184,7 @@ extension CollectionType where Generator.Element == Int, Index.Distance == Int, 
             let i = B0[SB0i]
             // remaining indices of SC (that we need to merge with SB0)
             let RISC = SISC.suffixFrom(acc.SRSISC)
-            // for i in B0 and j in C, return true iff Sj > Si
+            // for i in B0 and j in C, return true iff Rank(Sj) > Rank(Si)
             let rankGreaterThan: Index -> Bool = {
                 let j = C[RISC[$0]]
                 if j % 3 == 1 {
