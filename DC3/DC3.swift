@@ -108,13 +108,36 @@ extension CollectionType where Generator.Element == Int {
     }
 }
 
+// a lazy collection where C[i] can be derived from i
+struct AnyLazyCollection<Element>: LazyCollectionType {
+    let startIndex: Int
+    let endIndex: Int
+    let sub: Int -> Element
+    init(count: Int, sub: Int -> Element) {
+        startIndex = 0
+        endIndex = count
+        self.sub = sub
+    }
+    subscript (position: Int) -> Element {
+        return sub(position)
+    }
+    func generate() -> AnyGenerator<Element> {
+        return AnyGenerator(self.indices.lazy.map { self[$0] }.generate())
+    }
+}
+
 extension CollectionType where Generator.Element == Int, Index.Distance == Int, Index == Int, SubSequence.SubSequence: CollectionType, SubSequence.SubSequence.Generator.Element == Int, SubSequence.SubSequence.Index == Int {
     // returns the indexes of the sorted suffixes in self
     // e.g. [1, 2, 1, 2].suffixArray() = [2, 0, 3, 1]
+    // based on https://www.cs.helsinki.fi/u/tpkarkka/publications/jacm05-revised.pdf
     func suffixArray() -> [Index] {
         let toSuffixes = { self.suffixFrom($0).prefix(3) }
-        let B0 = indices.filter { $0 % 3 == 0 }
-        let C = indices.filter { $0 % 3 == 1 } + indices.filter { $0 % 3 == 2 }
+        let n = count
+        let nB0 = (n - 1) / 3 + 1
+        // 0, 3, 6, 9, ... (equivalent to indices.filter { $0 % 3 == 0 })
+        let B0 = AnyLazyCollection(count: nB0, sub: { self.startIndex + $0 * 3 })
+        // 1, 2, 4, 5, ... (equivalent to indices.filter { $0 % 3 != 0 })
+        let C = AnyLazyCollection(count: n - nB0, sub: { self.startIndex + $0 + $0 / 2 + 1 })
         // suffixes (of length 3) of C
         let SC = C.map(toSuffixes)
         let toKey = { ($0 ?? -1) + 1 }
@@ -152,9 +175,10 @@ extension CollectionType where Generator.Element == Int, Index.Distance == Int, 
         }) + [0, 0]
         // sorted indices of SB0
         let SISB0 = B0.map { [self[$0], ranks[$0 + 1]] }.radixSort(toKey: toKey)
-        // converts indexes of SC into indices of self
+        // converts indices of SC into indices of self
         // e.g. ISC2I(0) = 1, ISC2I(1) = 2, ISC2I(2) = 4, etc
         let ISC2I: Index -> Index = { C[$0] }
+        // merge SISB0 and SISC
         let out = SISB0.reduce((sortedIndices: [Index](), SRSISC: 0), combine: { acc, SB0i in
             // the index of the suffix we are sorting on (i.e. Si)
             let i = B0[SB0i]

@@ -3,21 +3,25 @@ import Foundation
 let toKey: UInt8? -> Int = { value in
     guard let value = value else { return 0 }
     let a = "a".utf8.first!
-    return Int(a.distanceTo(value)) + 1
+    return  Int(a.distanceTo(value)) + 1
 }
 
-let b = "yabbadabbado"
-let bUtf8 = b.utf8
-let bUtf8Keys = bUtf8.map { toKey($0) }
-let sortedSuffixes = bUtf8Keys.suffixArray().map { b.substringFromIndex(b.startIndex.advancedBy($0)) }.joinWithSeparator("\n")
-print("b:\n\(b)\n\nSA(b):\n\(sortedSuffixes)")
+let printSortedSuffixes = { (s: String.UTF8View) in
+    let sKeys = s.map { toKey($0) }
+    let SAs = sKeys.suffixArray()
+    let sortedSuffixes = SAs.map { String(s.suffixFrom(s.startIndex.advancedBy($0)))! }
+    print("s:\n\(s)\n")
+    print("SA(s):\n\(sortedSuffixes.joinWithSeparator("\n"))\n\n")
+}
+
+let s = "yabbadabbado"
+printSortedSuffixes(s.utf8)
 
 /*
- 
- b:
+ s:
  yabbadabbado
  
- SA(b):
+ SA(s):
  abbadabbado
  abbado
  adabbado
@@ -30,5 +34,4 @@ print("b:\n\(b)\n\nSA(b):\n\(sortedSuffixes)")
  do
  o
  yabbadabbado
- 
  */
