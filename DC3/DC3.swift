@@ -1,129 +1,178 @@
 import Foundation
 
-// generates a sequence of values start ... end by transforming the input by next()
-// I used this because it makes reverse iteration with CollectionType.Index.Distance easier
-func generator<T>(from start: T, to end: T, next: @escaping (T) -> T) -> AnyIterator<T> where T: Equatable {
-    var current: T = start
-    var prev: T?
-    return AnyIterator<T> {
-        if prev == end {
-            return nil
-        }
-        defer {
-            prev = current
-            current = next(current)
-        }
-        return current
-    }
-}
+extension Collection where Iterator.Element: Collection {
+    typealias SubElement = Iterator.Element.Iterator.Element
+    typealias SubIndexDistance = Iterator.Element.IndexDistance
+    typealias SubIndex = Iterator.Element.Index
 
-extension Collection where
-    Iterator.Element: Collection,
-    Iterator.Element.Iterator.Element: Equatable,
-    Indices.Iterator.Element == Index
-{
-    // returns the indices of self sorted by their corresponding collections
-    typealias SubCollectionElement = Iterator.Element.Iterator.Element
-    func radixSort(toKey: @escaping (SubCollectionElement?) -> Int) -> [Index] {
-        typealias Bucket = [Index]
+    func radixSortedIndices(key: (SubElement?) -> Int) -> [Index] {
+        var sortedIndices = initialIndices
         guard !isEmpty else {
             return []
         }
-        let maxKey = lazy.joined().map(toKey).max()!
-        // add one because buckets[maxKey] must be valid
-        let numBuckets = maxKey + 1
-        let maxNumDigits = lazy.map { $0.count }.max()!
-        let digitRange = generator(from: maxNumDigits, to: 0, next: { $0 - 1 })
-        // bucket sort self[i][j] for all i,j
-        return digitRange.reduce(Array(indices)) { sortedIndices, j in
-            let buckets = Array(repeating: Bucket(), count: numBuckets)
-            // bucket sort self[i][j] for all i
-            let filledBuckets = sortedIndices.reduce(buckets) { buckets, i in
-                // bucket sort self[i][j]
-                var buckets = buckets
-                let digits: Iterator.Element = self[i]
-                let digit: SubCollectionElement?
-                // we don't assume that all subcollections have the same length,
-                // so it's important to check that self[i][j] exists
-                if (0 ... digits.count - 1).contains(j) {
-                    let digitIndex = digits.index(digits.startIndex, offsetBy: j)
-                    digit = digits[digitIndex]
-                }
-                else {
-                    digit = nil
-                }
-                let digitKey = toKey(digit)
-                buckets[digitKey] = buckets[digitKey] + [i]
-                return buckets
+        let maxCollectionSize = lazy.map { $0.count }.max()!
+        var distance = maxCollectionSize
+        while distance != 0 {
+            distance = distance - 1
+            let subElements = subElementsAtDistanceFromStart(distance, orderedBy: sortedIndices)
+            sortedIndices = subElements.bucketSort(key: { pair in
+                return key(pair!.1)
+            }).map {
+                $0.0
             }
-            return Array(filledBuckets.joined())
         }
+        return sortedIndices
+    }
+
+    private func subElementsAtDistanceFromStart(_ distance: SubIndexDistance, orderedBy indices: [Index]) -> LazyMapRandomAccessCollection<[Index], (Index, SubElement?)> {
+        return indices.lazy.map { (i: Index) -> (Index, SubElement?) in
+            let subCollection = self[i]
+            guard let j = subCollection.index(subCollection.startIndex, offsetBy: distance, limitedBy: subCollection.endIndex), j != subCollection.endIndex else {
+                return (i, nil) // no element exists at subCollection[j]
+            }
+            return (i, subCollection[j])
+        }
+    }
+
+    private var initialIndices: [Index] {
+        var sortedIndices = [Index]()
+        var i = startIndex
+        while i != endIndex {
+            sortedIndices.append(i)
+            formIndex(after: &i)
+        }
+        return sortedIndices
+    }
+
+    func radixSort(key: (SubElement?) -> Int) -> [Iterator.Element] {
+        return radixSortedIndices(key: key).map { self[$0] }
     }
 }
 
-extension Collection where Iterator.Element: Collection, Index == Int, Iterator.Element.Iterator.Element: Equatable {
+extension Collection {
+    func bucketSort(key: (Iterator.Element?) -> Int, maxKey: Int) -> [Iterator.Element] {
+        return bucketSortedIndices(key: key, maxKey: maxKey).map { self[$0] }
+    }
+
+    func bucketSortedIndices(key: (Iterator.Element?) -> Int, maxKey: Int) -> [Index] {
+        var buckets = [[Index]].init(repeating: [], count: maxKey + 1)
+        var i = startIndex
+        while i != endIndex {
+            let element = self[i]
+            let key = key(element)
+            let indices = buckets[key]
+            buckets[key] = indices + [i]
+            formIndex(after: &i)
+        }
+        var sortedIndices = [Index]()
+        for bucket in buckets {
+            sortedIndices.append(contentsOf: bucket)
+        }
+        return sortedIndices
+    }
+
+    func bucketSort(key: (Iterator.Element?) -> Int) -> [Iterator.Element] {
+        guard let maxKey = map(key).max() else {
+            return []
+        }
+        return bucketSort(key: key, maxKey: maxKey)
+    }
+
+    func bucketSortedIndices(key: (Iterator.Element?) -> Int) -> [Index] {
+        guard let maxKey = map(key).max() else {
+            return []
+        }
+        return bucketSortedIndices(key: key, maxKey: maxKey)
+    }
+}
+
+
+extension Collection {
     // returns the ranks of elements in an array
     // all elements with the same value will have the same rank
     // e.g. [2, 1, 4, 2].radixSort() = [1, 0, 3, 2]
-    // [2, 1, 4, 2].ranks([1, 0, 3, 2]) = [1, 2, 3, 2]
-    func ranks(_ sortedIndices: [Index]) -> [Int] {
-        typealias ValueRank = (value: Iterator.Element, rank: Int)
-        typealias Acc = (ranks: [Int], prev: ValueRank?)
-        let ranks = map { _ in 0 }
-        let t: Acc = (ranks, nil)
-        return sortedIndices.reduce(t, { t, i in
-            let cur = self[i]
-            let vr: ValueRank
-            if let prev = t.prev {
-                if cur.elementsEqual(prev.value) {
-                    vr = prev
-                }
-                else {
-                    vr = (cur, (prev.rank + 1))
-                }
+    //      [2, 1, 4, 2].ranks([1, 0, 3, 2]) = [1, 2, 3, 2]
+    func ranks(sortedIndices: [Index], compare: (Iterator.Element, Iterator.Element) -> Bool) -> [Int] {
+        guard let firstIndex = sortedIndices.first else {
+            return []
+        }
+        var ranks = [1]
+        var previousRank = 1
+        var previousElement = self[firstIndex]
+        for i in sortedIndices.dropFirst() {
+            let element = self[i]
+            let rank: Int
+            if compare(element, previousElement) {
+                rank = previousRank
+            } else {
+                rank = previousRank + 1
             }
-            else {
-                vr = (cur, 1)
-            }
-            var ranks = t.ranks
-            ranks[i] = vr.rank
-            return (ranks, vr)
-        }).ranks
+            ranks.append(rank)
+            previousElement = element
+            previousRank = rank
+        }
+        return ranks
     }
 }
 
-extension Collection where Indices.Iterator.Element == Index {
+extension Collection {
     subscript(safe i: Index) -> Iterator.Element? {
-        return indices.contains(i) ? self[i] : nil
+        if (startIndex ..< endIndex).contains(i) {
+            return self[i]
+        }
+        return nil
     }
 }
 
-extension Collection where Iterator.Element == Int, Indices.SubSequence: Collection, Indices.SubSequence.Iterator.Element == Index {
-    func adjacentDuplicateExists() -> Bool {
-        return indices.dropLast().lazy.filter {
-            self[$0] == self[self.index(after: $0)]
-            }.first != nil
+extension Collection {
+    func adjacentDuplicateExists(areEqual: (Iterator.Element, Iterator.Element) -> Bool) -> Bool {
+        guard startIndex != endIndex else {
+            return false
+        }
+        var previousIndex = startIndex
+        var i = index(after: startIndex)
+        while i != endIndex {
+            let previousElement = self[previousIndex]
+            let element = self[i]
+            if areEqual(previousElement, element) {
+                return true
+            }
+            previousIndex = i
+            formIndex(after: &i)
+        }
+        return false
     }
 }
 
-// a lazy collection where C[i] can be derived from i
-struct AnyLazyCollection<Element>: LazyCollectionProtocol {
-    let startIndex: Int
-    let endIndex: Int
-    let sub: (Int) -> Element
-    init(count: Int, sub: @escaping (Int) -> Element) {
-        startIndex = 0
-        endIndex = count
-        self.sub = sub
+extension Collection where IndexDistance == Int {
+    private func B0(distance: IndexDistance) -> Index {
+        return index(startIndex, offsetBy: distance * 3)
     }
-    subscript (position: Int) -> Element {
-        return sub(position)
+
+    private var B0Length: IndexDistance {
+        return (count - 1) / 3 + 1
     }
-    public func index(after i: Int) -> Int {
-        return i + 1
+
+    // 0, 3, 6, 9, ...
+    var B0: LazyMapRandomAccessCollection<(CountableRange<Int>), Self.Index> {
+        return (0 ..< B0Length).lazy.map {
+            self.B0(distance: $0)
+        }
     }
-    func makeIterator() -> AnyIterator<Element> {
-        return AnyIterator(self.indices.lazy.map { self[$0] }.makeIterator())
+
+    // 1, 2, 4, 5, ...
+    private func C(distance: IndexDistance) -> Index {
+        return index(startIndex, offsetBy: 3 * (distance / 2) + 1 + distance % 2)
+    }
+
+    private var CLength: IndexDistance {
+        return count - B0Length
+    }
+
+    var C: LazyMapRandomAccessCollection<(CountableRange<Int>), Self.Index> {
+        return (0 ..< CLength).lazy.map {
+            self.C(distance: $0)
+        }
     }
 }
 
@@ -132,28 +181,32 @@ extension Collection where
     IndexDistance == Int,
     Index == Int,
     SubSequence.SubSequence: Collection,
-    SubSequence.SubSequence.Iterator.Element == Int,
     SubSequence.SubSequence.Index == Int,
+    SubSequence.SubSequence.Iterator.Element == Int,
     Indices.Iterator.Element == Index
 {
     // returns the indexes of the sorted suffixes in self
     // e.g. [1, 2, 1, 2].suffixArray() = [2, 0, 3, 1]
     // based on https://www.cs.helsinki.fi/u/tpkarkka/publications/jacm05-revised.pdf
-    func suffixArray() -> [Index] {
+    func suffixArray() -> [Int] {
         let toSuffixes = { self.suffix(from: $0).prefix(3) }
-        let n = count
-        let nB0 = (n - 1) / 3 + 1
-        // 0, 3, 6, 9, ... (equivalent to indices.filter { $0 % 3 == 0 })
-        let B0 = AnyLazyCollection(count: nB0, sub: { self.startIndex + $0 * 3 })
-        // 1, 2, 4, 5, ... (equivalent to indices.filter { $0 % 3 != 0 })
-        let C = AnyLazyCollection(count: n - nB0, sub: { self.startIndex + $0 + $0 / 2 + 1 })
+        // TODO: Make B0 and C lazy
+        let B0 = self.B0
+        let C = self.C
         // suffixes (of length 3) of C
         let SC = C.map(toSuffixes)
-        let toKey = { ($0 ?? -1) + 1 }
+        let key: (Int?) -> Int = { x in
+            guard let x = x else {
+                return 0
+            }
+            return x + 1
+        }
         // preliminary sorted indices of SC
-        let PSISC = SC.radixSort(toKey: toKey)
+        let PSISC = SC.radixSortedIndices(key: key)
         // preliminary ranks of SC
-        let PRSC = SC.ranks(PSISC)
+        let PRSC = SC.ranks(sortedIndices: PSISC, compare: { (lhs, rhs) in
+            lhs.elementsEqual(rhs)
+        })
         // ranks of SC
         let RSC: [Int]
         // sorted indices of SC
@@ -161,7 +214,7 @@ extension Collection where
         // sorted preliminary ranks of SC
         let SPRSC = PSISC.lazy.map({ PRSC[$0] })
         // is there a duplicated rank in PRSC (e.g. PRSC = [2, 1, 1, 3])?
-        if SPRSC.adjacentDuplicateExists() {
+        if SPRSC.adjacentDuplicateExists(areEqual: ==) {
             // if so, we need to recurse on PRSC to get the sorted order of SC (e.g. SISC = [3, 1, 2, 4])
             SISC = PRSC.suffixArray()
             RSC = SISC.reduce((ranks: [Int](repeating: 0, count: SC.count), rank: 1), { acc, i in
@@ -183,7 +236,7 @@ extension Collection where
             return ranks
         }) + [0, 0]
         // sorted indices of SB0
-        let SISB0 = B0.map { [self[$0], ranks[$0 + 1]] }.radixSort(toKey: toKey)
+        let SISB0 = B0.map { [self[$0], ranks[$0 + 1]] }.radixSortedIndices(key: key)
         // converts indices of SC into indices of self
         // e.g. ISC2I(0) = 1, ISC2I(1) = 2, ISC2I(2) = 4, etc
         let ISC2I: (Index) -> Index = { C[$0] }
