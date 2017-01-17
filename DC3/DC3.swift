@@ -162,7 +162,13 @@ extension Collection where IndexDistance == Int {
 
     // 1, 2, 4, 5, ...
     private func C(distance: IndexDistance) -> Index {
-        return index(startIndex, offsetBy: 3 * (distance / 2) + 1 + distance % 2)
+        let offset: IndexDistance
+        if distance == 0 {
+            offset = 1
+        } else {
+            offset = 2 * distance - (distance - 1) / 2
+        }
+        return index(startIndex, offsetBy: offset)
     }
 
     private var CLength: IndexDistance {
