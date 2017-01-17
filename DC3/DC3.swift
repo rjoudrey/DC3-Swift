@@ -164,7 +164,7 @@ extension Collection where
             return self[i ..< j]
         }
         // Debugging:
-        // for s in SC { print(String(s.map { Character(UnicodeScalar($0)!) })) }
+        print(SC.map { String($0.map { Character(UnicodeScalar($0)!) }) })
 
         // ------------------- Step 1: Sort sample suffixes -------------------
         // Radix sort the characters of R
@@ -182,6 +182,34 @@ extension Collection where
         for (index, rank) in zip(sortedIndicesOfR, sortedRanksOfR) {
             RPrime[index] = rank
         }
+        // Debugging:
+        print(RPrime)
+
+        let sortedIndicesOfRPrime: [Int]
+
+        var ranksSi = [Int?](repeating: nil, count: count + 1) + [0, 0]
+        if sortedRanksOfR.adjacentDuplicateExists(areEqual: ==) {
+            // there is a non-unique character in RPrime
+            sortedIndicesOfRPrime = [ 8,0,1,6,4,2,5,3,7 ] // RPrime.suffixArray()
+        } else {
+            sortedIndicesOfRPrime = RPrime
+        }
+
+        var rank = 0
+        for i in sortedIndicesOfRPrime {
+            defer {
+                rank = rank + 1
+            }
+            if i == R.endIndex {
+                continue
+            }
+            // R is [1, 2, 4, 5 etc]
+            let j = R[i]
+            ranksSi[j] = rank
+        }
+        print(ranksSi)
+
+        // ----------------- Step 2: Sort nonsample suffixes -----------------
         return []
     }
 }
