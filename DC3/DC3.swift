@@ -144,6 +144,7 @@ extension Collection {
     }
 }
 
+// TODO: Wrap each step in a test
 extension Collection where
     IndexDistance == Int,
     Index == Int,
@@ -192,7 +193,8 @@ extension Collection where
             // there is a non-unique character in RPrime
             sortedIndicesOfRPrime = [ 8,0,1,6,4,2,5,3,7 ] // RPrime.suffixArray()
         } else {
-            sortedIndicesOfRPrime = RPrime
+            // TODO: Test this
+            sortedIndicesOfRPrime = RPrime.map { $0 - 1 }
         }
 
         var rank = 0
