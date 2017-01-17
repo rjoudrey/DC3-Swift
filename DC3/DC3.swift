@@ -144,143 +144,44 @@ extension Collection {
     }
 }
 
-extension Collection where IndexDistance == Int {
-    private func B0(distance: IndexDistance) -> Index {
-        return index(startIndex, offsetBy: distance * 3)
-    }
-
-    private var B0Length: IndexDistance {
-        return (count - 1) / 3 + 1
-    }
-
-    // 0, 3, 6, 9, ...
-    var B0: LazyMapRandomAccessCollection<(CountableRange<Int>), Self.Index> {
-        return (0 ..< B0Length).lazy.map {
-            self.B0(distance: $0)
-        }
-    }
-
-    // 1, 2, 4, 5, ...
-    private func C(distance: IndexDistance) -> Index {
-        let offset: IndexDistance
-        if distance == 0 {
-            offset = 1
-        } else {
-            offset = 2 * distance - (distance - 1) / 2
-        }
-        return index(startIndex, offsetBy: offset)
-    }
-
-    private var CLength: IndexDistance {
-        return count - B0Length
-    }
-
-    var C: LazyMapRandomAccessCollection<(CountableRange<Int>), Self.Index> {
-        return (0 ..< CLength).lazy.map {
-            self.C(distance: $0)
-        }
-    }
-}
-
 extension Collection where
-    Iterator.Element == Int,
     IndexDistance == Int,
     Index == Int,
-    SubSequence.SubSequence: Collection,
-    SubSequence.SubSequence.Index == Int,
-    SubSequence.SubSequence.Iterator.Element == Int,
-    Indices.Iterator.Element == Index
+    SubSequence: Collection,
+    SubSequence.Iterator.Element == Int
 {
-    // returns the indexes of the sorted suffixes in self
-    // e.g. [1, 2, 1, 2].suffixArray() = [2, 0, 3, 1]
     // based on https://www.cs.helsinki.fi/u/tpkarkka/publications/jacm05-revised.pdf
     func suffixArray() -> [Int] {
-        let toSuffixes = { self.suffix(from: $0).prefix(3) }
-        // TODO: Make B0 and C lazy
-        let B0 = self.B0
-        let C = self.C
-        // suffixes (of length 3) of C
-        let SC = C.map(toSuffixes)
-        let key: (Int?) -> Int = { x in
+        // -------------------- Step 0: Construct a sample --------------------
+        // sample positions
+        let indices = startIndex ..< endIndex
+        let R1 = indices.filter { $0 % 3 == 1 }
+        let R2 = indices.filter { $0 % 3 == 2 }
+        let R = R1 + R2
+        // sample suffixes
+        let SC = R.map { i -> SubSequence in
+            let j = Swift.min(i + 3, self.endIndex)
+            return self[i ..< j]
+        }
+        // Debugging:
+        // for s in SC { print(String(s.map { Character(UnicodeScalar($0)!) })) }
+
+        // ------------------- Step 1: Sort sample suffixes -------------------
+        // Radix sort the characters of R
+        let sortedIndicesOfR = SC.radixSortedIndices(key: { x in
             guard let x = x else {
                 return 0
             }
             return x + 1
-        }
-        // preliminary sorted indices of SC
-        let PSISC = SC.radixSortedIndices(key: key)
-        // preliminary ranks of SC
-        let PRSC = SC.ranks(sortedIndices: PSISC, compare: { (lhs, rhs) in
-            lhs.elementsEqual(rhs)
         })
-        // ranks of SC
-        let RSC: [Int]
-        // sorted indices of SC
-        let SISC: [Int]
-        // sorted preliminary ranks of SC
-        let SPRSC = PSISC.lazy.map({ PRSC[$0] })
-        // is there a duplicated rank in PRSC (e.g. PRSC = [2, 1, 1, 3])?
-        if SPRSC.adjacentDuplicateExists(areEqual: ==) {
-            // if so, we need to recurse on PRSC to get the sorted order of SC (e.g. SISC = [3, 1, 2, 4])
-            SISC = PRSC.suffixArray()
-            RSC = SISC.reduce((ranks: [Int](repeating: 0, count: SC.count), rank: 1), { acc, i in
-                var acc = acc
-                acc.ranks[i] = acc.rank
-                return (acc.ranks, acc.rank + 1)
-            }).ranks
-        }
-        else {
-            // if not, the "preliminary" ranks and sorted indices are the final sorted order of SC
-            SISC = PSISC
-            RSC = PRSC
-        }
-        // we build this array in order to simplify the calculation of rank(Si+1) and rank(Si+2)
-        // note: we add two zeroes to the end of ranks so that (i+2) will always be a valid index of ranks
-        let ranks = zip(C, RSC).reduce([Int](repeating: 0, count: count), { ranks, indexAndRank in
-            var ranks = ranks
-            ranks[indexAndRank.0] = indexAndRank.1
-            return ranks
-        }) + [0, 0]
-        // sorted indices of SB0
-        let SISB0 = B0.map { [self[$0], ranks[$0 + 1]] }.radixSortedIndices(key: key)
-        // converts indices of SC into indices of self
-        // e.g. ISC2I(0) = 1, ISC2I(1) = 2, ISC2I(2) = 4, etc
-        let ISC2I: (Index) -> Index = { C[$0] }
-        // merge SISB0 and SISC
-        let out = SISB0.reduce((sortedIndices: [Index](), SRSISC: 0), { acc, SB0i in
-            // the index of the suffix we are sorting on (i.e. Si)
-            let i = B0[SB0i]
-            // remaining indices of SC (that we need to merge with SB0)
-            let RISC = SISC.suffix(from: acc.SRSISC)
-            // for i in B0 and j in C, return true iff Rank(Sj) > Rank(Si)
-            let rankGreaterThan: (Index) -> Bool = {
-                let j = C[RISC[$0]]
-                if j % 3 == 1 {
-                    let RSi = (self[i], ranks[i + 1])
-                    let RSj = (self[j], ranks[j + 1])
-                    return RSj > RSi
-                }
-                else {
-                    // note: self[i + 1] may not exist, so we manually check the bounds
-                    let RSi = (self[i], self[safe: i + 1] ?? 0, ranks[i + 2])
-                    let RSj = (self[j], self[safe: j + 1] ?? 0, ranks[j + 2])
-                    return RSj > RSi
-                }
-            }
-            // the index of SISC where RISC will start at next round
-            let SRSISC: Index
-            // the indexes of RISC where Sj < Si
-            let IRLTI: [Index]
-            if let FGTI = RISC.indices.lazy.filter(rankGreaterThan).first {
-                IRLTI = SISC[RISC.startIndex ..< FGTI].map(ISC2I)
-                SRSISC = FGTI
-            }
-            else {
-                IRLTI = RISC.map(ISC2I)
-                SRSISC = SISC.endIndex
-            }
-            return (acc.sortedIndices + IRLTI + [i], SRSISC)
+        // Rename the characters with their ranks
+        let sortedRanksOfR = SC.ranks(sortedIndices: sortedIndicesOfR, compare: {
+            $0.elementsEqual($1)
         })
-        return out.sortedIndices + SISC.suffix(from: out.SRSISC).map(ISC2I)
+        var RPrime = [Int](repeating: 0, count: SC.count)
+        for (index, rank) in zip(sortedIndicesOfR, sortedRanksOfR) {
+            RPrime[index] = rank
+        }
+        return []
     }
 }
