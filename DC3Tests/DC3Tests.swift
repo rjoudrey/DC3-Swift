@@ -99,7 +99,66 @@ class DC3Tests: XCTestCase {
         XCTAssertEqual(expected, actual)
     }
 
-    func testSuffixArray() {
+    var expectedPart0Output: SuffixArrayPart0Output {
+        let R = ["abb", "ada", "bba", "do", "bba", "dab", "bad", "o"].map(toInts)
+        let output = SuffixArrayPart0Output(
+            B1: [1, 4, 7, 10],
+            B2: [2, 5, 8, 11],
+            C: [1, 4, 7, 10, 2, 5, 8, 11],
+            R: R
+        )
+        return output
+    }
+
+    func testSuffixArrayPart0() {
+        let input = "yabbadabbado".utf8.map { Int($0) }
+        let actual = suffixArrayPart0(input: input)
+        let expected = expectedPart0Output
+        XCTAssertEqual(actual.B1, expected.B1)
+        XCTAssertEqual(actual.B2, expected.B2)
+        XCTAssertEqual(actual.C, expected.C)
+        XCTAssertTrue(actual.R.elementsEqual(expected.R, by: ==))
+    }
+
+    var expectedPart1Output: SuffixArrayPart1Output {
+        return SuffixArrayPart1Output(
+            ranksOfR: [1, 2, 4, 6, 4, 5, 3, 7],
+            sortedIndicesOfR: [0, 1, 6, 2, 4, 5, 3, 7],
+            sortedRanksOfR: [1, 2, 3, 4, 4, 5, 6, 7]
+        )
+    }
+
+    func testSuffixArrayPart1() {
+        let input = expectedPart0Output
+        let actual = suffixArrayPart1(part0: input)
+        let expected = expectedPart1Output
+        XCTAssertEqual(actual.ranksOfR, expected.ranksOfR)
+        XCTAssertEqual(actual.sortedIndicesOfR, expected.sortedIndicesOfR)
+        XCTAssertEqual(actual.sortedRanksOfR, expected.sortedRanksOfR)
+    }
+
+    var expectedPart1_5Output: SuffixArrayPart1_5Output {
+        return SuffixArrayPart1_5Output(
+            sortedIndicesOfR: []
+        )
+    }
+
+    func testSuffixArrayPart1_5() {
+        let input = expectedPart1Output
+        let actual = suffixArrayPart1_5(part1: input)
+        let expected = expectedPart1_5Output
+        XCTAssertEqual(actual.sortedIndicesOfR, expected.sortedIndicesOfR)
+    }
+
+    func toChars(ints: [Int]) -> String {
+        return String(ints.map { Character(UnicodeScalar($0)!) })
+    }
+
+    func toInts(string: String) -> [Int] {
+        return string.utf8.map { Int($0) }
+    }
+
+    /*func testSuffixArray() {
         let elements = [1, 2, 5, 4, 3, 1, 3]
         // suffixes:
         // 0: 1, 2, 5, 4, 3, 1, 3
@@ -112,9 +171,9 @@ class DC3Tests: XCTestCase {
         let actual = elements.suffixArray()
         let expected = [0, 5, 1, 6, 4, 3, 2]
         XCTAssertEqual(expected, actual)
-    }
+    }*/
 
-    func testSuffixArray2() {
+    /*func testSuffixArray2() {
         let bundle = Bundle(for: type(of: self))
         let url = bundle.url(forResource: "words", withExtension: "txt")!
         let wordList = try! String(contentsOf: url)
@@ -145,5 +204,5 @@ class DC3Tests: XCTestCase {
             }
             numberOfSuccesses += 1
         }
-    }
+    }*/
 }

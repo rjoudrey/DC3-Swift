@@ -144,74 +144,90 @@ extension Collection {
     }
 }
 
-// TODO: Wrap each step in a test
-extension Collection where
-    IndexDistance == Int,
-    Index == Int,
-    SubSequence: Collection,
-    SubSequence.Iterator.Element == Int
-{
-    // based on https://www.cs.helsinki.fi/u/tpkarkka/publications/jacm05-revised.pdf
-    func suffixArray() -> [Int] {
-        // -------------------- Step 0: Construct a sample --------------------
-        // sample positions
-        let indices = startIndex ..< endIndex
-        let R1 = indices.filter { $0 % 3 == 1 }
-        let R2 = indices.filter { $0 % 3 == 2 }
-        let R = R1 + R2
-        // sample suffixes
-        let SC = R.map { i -> SubSequence in
-            let j = Swift.min(i + 3, self.endIndex)
-            return self[i ..< j]
-        }
-        // Debugging:
-        print(SC.map { String($0.map { Character(UnicodeScalar($0)!) }) })
+struct SuffixArrayPart0Output {
+    let B1: [Int]
+    let B2: [Int]
+    let C: [Int]
+    let R: [[Int]]
+}
 
-        // ------------------- Step 1: Sort sample suffixes -------------------
-        // Radix sort the characters of R
-        let sortedIndicesOfR = SC.radixSortedIndices(key: { x in
-            guard let x = x else {
-                return 0
-            }
-            return x + 1
-        })
-        // Rename the characters with their ranks
-        let sortedRanksOfR = SC.ranks(sortedIndices: sortedIndicesOfR, compare: {
-            $0.elementsEqual($1)
-        })
-        var RPrime = [Int](repeating: 0, count: SC.count)
-        for (index, rank) in zip(sortedIndicesOfR, sortedRanksOfR) {
-            RPrime[index] = rank
-        }
-        // Debugging:
-        print(RPrime)
+struct SuffixArrayPart1Output {
+    let ranksOfR: [Int] // may contain duplicate ranks
+    let sortedIndicesOfR: [Int]
+    let sortedRanksOfR: [Int]
+}
 
-        let sortedIndicesOfRPrime: [Int]
+struct SuffixArrayPart1_5Output {
+    let sortedIndicesOfR: [Int]
+}
 
-        var ranksSi = [Int?](repeating: nil, count: count + 1) + [0, 0]
-        if sortedRanksOfR.adjacentDuplicateExists(areEqual: ==) {
-            // there is a non-unique character in RPrime
-            sortedIndicesOfRPrime = [ 8,0,1,6,4,2,5,3,7 ] // RPrime.suffixArray()
-        } else {
-            // TODO: Test this
-            sortedIndicesOfRPrime = RPrime.map { $0 - 1 }
-        }
+struct SuffixArrayPart1_7Output {
+    let ranksOfSi: [Int?] // contains no duplicate ranks
+}
 
-        var rank = 0
-        for i in sortedIndicesOfRPrime {
-            defer {
-                rank = rank + 1
-            }
-            if i == R.endIndex {
-                continue
-            }
-            // R is [1, 2, 4, 5 etc]
-            let j = R[i]
-            ranksSi[j] = rank
-        }
-        print(ranksSi)
+// based on https://www.cs.helsinki.fi/u/tpkarkka/publications/jacm05-revised.pdf
 
-        // ----------------- Step 2: Sort nonsample suffixes -----------------
-        return []
+// Construct a sample
+func suffixArrayPart0(input: [Int]) -> SuffixArrayPart0Output {
+    let indices = input.indices
+    let B1 = indices.filter { $0 % 3 == 1 }
+    let B2 = indices.filter { $0 % 3 == 2 }
+    // sample positions
+    let C = B1 + B2
+    // sample suffixes
+    let R = C.map { i -> [Int] in
+        let j = Swift.min(i + 3, input.endIndex)
+        return Array(input[i ..< j])
     }
+    // print(SC.map { String($0.map { Character(UnicodeScalar($0)!) }) })
+    return SuffixArrayPart0Output(B1: B1, B2: B2, C: C, R: R)
+}
+
+// Sort sample suffixes
+func suffixArrayPart1(part0: SuffixArrayPart0Output) -> SuffixArrayPart1Output {
+    // Radix sort the characters of R
+    let sortedIndicesOfR = part0.R.radixSortedIndices(key: { x in
+        guard let x = x else {
+            return 0
+        }
+        return x + 1
+    })
+    // Rename the characters with their ranks
+    let sortedRanksOfR = part0.R.ranks(sortedIndices: sortedIndicesOfR, compare: {
+        $0.elementsEqual($1)
+    })
+    var ranksOfR = [Int](repeating: 0, count: part0.R.count)
+    for (index, rank) in zip(sortedIndicesOfR, sortedRanksOfR) {
+        ranksOfR[index] = rank
+    }
+    return SuffixArrayPart1Output(ranksOfR: ranksOfR, sortedIndicesOfR: sortedIndicesOfR, sortedRanksOfR: sortedRanksOfR)
+}
+
+func suffixArrayPart1_5(part1: SuffixArrayPart1Output) -> SuffixArrayPart1_5Output {
+    let sortedIndicesOfR: [Int]
+    if part1.sortedRanksOfR.adjacentDuplicateExists(areEqual: ==) {
+        // there is a non-unique character in RPrime
+        // sortedIndicesOfR = part1.ranksOfR.suffixArray()
+        sortedIndicesOfR = []
+        // todo: fix this
+    } else {
+        sortedIndicesOfR = part1.sortedRanksOfR.map { $0 - 1 }
+    }
+    return SuffixArrayPart1_5Output(sortedIndicesOfR: sortedIndicesOfR)
+}
+
+func suffixArrayPart1_7(part1_5: SuffixArrayPart1_5Output, R: [Int], count: Int) -> SuffixArrayPart1_7Output {
+    var ranksOfSi = [Int?](repeating: nil, count: count + 1) + [0, 0]
+    var rank = 0
+    for i in part1_5.sortedIndicesOfR {
+        defer {
+            rank = rank + 1
+        }
+        if i == R.endIndex {
+            continue
+        }
+        let j = R[i]
+        ranksOfSi[j] = rank
+    }
+    return SuffixArrayPart1_7Output(ranksOfSi: ranksOfSi)
 }
