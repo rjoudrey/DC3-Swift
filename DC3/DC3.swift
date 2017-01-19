@@ -258,3 +258,10 @@ func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]
     return SuffixArrayPart2Output(ranksOfSj: ranksOfSj)
 }
 
+// Merge suffixes
+func suffixArray3(input: [Int], ranksSi: [Int], ranksSj: [Int]) {
+    // i ∈ B1 : Si ≤ Sj ⇐⇒ (ti,rank(Si+1)) ≤ (tj,rank(Sj+1))
+    // i ∈ B2 : Si ≤ Sj ⇐⇒ (ti,ti+1,rank(Si+2)) ≤ (tj,tj+1,rank(Sj+2))
+    
+}
+
