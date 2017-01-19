@@ -216,18 +216,47 @@ func suffixArrayPart1_5(part1: SuffixArrayPart1Output) -> SuffixArrayPart1_5Outp
     return SuffixArrayPart1_5Output(sortedIndicesOfR: sortedIndicesOfR)
 }
 
-func suffixArrayPart1_7(part1_5: SuffixArrayPart1_5Output, R: [Int], count: Int) -> SuffixArrayPart1_7Output {
-    var ranksOfSi = [Int?](repeating: nil, count: count + 1) + [0, 0]
+func suffixArrayPart1_7(part1_5: SuffixArrayPart1_5Output, C: [Int], count: Int) -> SuffixArrayPart1_7Output {
+    var ranksOfSi = [Int?](repeating: nil, count: count) + [0, 0]
     var rank = 0
     for i in part1_5.sortedIndicesOfR {
         defer {
             rank = rank + 1
         }
-        if i == R.endIndex {
+        if i == C.endIndex {
             continue
         }
-        let j = R[i]
+        let j = C[i]
         ranksOfSi[j] = rank
     }
     return SuffixArrayPart1_7Output(ranksOfSi: ranksOfSi)
 }
+
+// (ti, rank(Si+1))
+struct SuffixArrayPart2Output {
+    var ranksOfSj: [Int?]
+}
+
+// Sort nonsample suffixes
+func suffixArray2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]) -> SuffixArrayPart2Output {
+    let pairs = B0.map { i in
+        [input[i], part1_7.ranksOfSi[i + 1]!]
+    }
+    let sortedIndicesOfSB0 = pairs.radixSortedIndices(key: { pair in
+        if let pair = pair {
+            return pair
+        }
+        return 0
+    })
+    var ranksOfSj = [Int?](repeating: nil, count: input.count + 1) + [0, 0]
+    var rank = 1
+    for i in sortedIndicesOfSB0 {
+        let index = B0[i]
+        ranksOfSj[index] = rank
+        rank += 1
+    }
+    return SuffixArrayPart2Output(ranksOfSj: ranksOfSj)
+}
+
+
+
