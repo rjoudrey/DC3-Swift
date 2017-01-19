@@ -248,7 +248,7 @@ func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]
         }
         return 0
     })
-    var ranksOfSj = [Int?](repeating: nil, count: input.count + 1) + [0, 0]
+    var ranksOfSj = [Int?](repeating: nil, count: input.count) + [0, 0]
     var rank = 1
     for i in sortedIndicesOfSB0 {
         let index = B0[i]
@@ -259,9 +259,49 @@ func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]
 }
 
 // Merge suffixes
-func suffixArray3(input: [Int], ranksSi: [Int], ranksSj: [Int]) {
-    // i ∈ B1 : Si ≤ Sj ⇐⇒ (ti,rank(Si+1)) ≤ (tj,rank(Sj+1))
-    // i ∈ B2 : Si ≤ Sj ⇐⇒ (ti,ti+1,rank(Si+2)) ≤ (tj,tj+1,rank(Sj+2))
-    
+func suffixArrayPart3(input: [Int], ranksSi: [Int?], ranksSj: [Int?]) -> [Int] {
+    var ranks = ranksSj.map { _ in 0 }
+    for (i, r) in ranksSi.enumerated() {
+        if let r = r {
+            ranks[i] = r
+        }
+    }
+    for (i, r) in ranksSj.enumerated() {
+        if let r = r {
+            ranks[i] = r
+        }
+    }
+
+    var sortedIndices = [Int]()
+    var i = 1 // 1, 2, 4, 5, ...
+    var j = 0 // 0, 3, 6, 9, ...
+
+    while i != input.endIndex && j != input.endIndex {
+        let lessThan: Bool
+        switch i % 3 {
+        case 1: // i is in B1
+            lessThan = (input[i], ranks[i + 1]) <= (input[j], ranks[j + 1])
+        case 2: // i is in B2
+            lessThan = (input[i], input[i + 1], ranks[i + 2]) <= (input[j], input[j + 1], ranks[j + 2])
+        default:
+            fatalError()
+        }
+        // suffix[i] is less than suffix[j], so increment i
+        if lessThan {
+            sortedIndices.append(i)
+            switch i % 3 {
+            case 1:
+                i = i + 1
+            case 2:
+                i = i + 2
+            default:
+                fatalError()
+            }
+        } else {
+            sortedIndices.append(j)
+            j = min(input.endIndex, j + 3)
+        }
+    }
+    return sortedIndices
 }
 

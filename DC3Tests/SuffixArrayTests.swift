@@ -61,6 +61,13 @@ class SuffixArrayTests: XCTestCase {
         let expected = expectedSuffixArrayPart2Output
         XCTAssertTrue(actual.ranksOfSj.elementsEqual(expected.ranksOfSj, by: ==))
     }
+
+    func testsuffixArrayPart3() {
+        let ranksSi = expectedSuffixArrayPart1_7Output.ranksOfSi
+        let ranksSj = expectedSuffixArrayPart2Output.ranksOfSj
+        let actual = suffixArrayPart3(input: suffixArrayInput, ranksSi: ranksSi, ranksSj: ranksSj)
+        let expected = [Int]()
+    }
     
     func toChars(ints: [Int]) -> String {
         return String(ints.map { Character(UnicodeScalar($0)!) })
