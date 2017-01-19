@@ -238,7 +238,7 @@ struct SuffixArrayPart2Output {
 }
 
 // Sort nonsample suffixes
-func suffixArray2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]) -> SuffixArrayPart2Output {
+func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]) -> SuffixArrayPart2Output {
     let pairs = B0.map { i in
         [input[i], part1_7.ranksOfSi[i + 1]!]
     }
@@ -257,6 +257,4 @@ func suffixArray2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]) ->
     }
     return SuffixArrayPart2Output(ranksOfSj: ranksOfSj)
 }
-
-
 

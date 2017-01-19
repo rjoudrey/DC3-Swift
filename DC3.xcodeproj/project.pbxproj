@@ -12,6 +12,7 @@
 		D1708F7C1E2DBD6A00BD12BA /* DC3.h in Headers */ = {isa = PBXBuildFile; fileRef = D1708F6E1E2DBD6A00BD12BA /* DC3.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D1708F841E2DBD8900BD12BA /* DC3.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1708F831E2DBD8900BD12BA /* DC3.swift */; };
 		D1708F861E2DBF9D00BD12BA /* words.txt in Resources */ = {isa = PBXBuildFile; fileRef = D1708F851E2DBF9D00BD12BA /* words.txt */; };
+		D1B5C8921E307D1C00CCE9CF /* SuffixArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B5C8911E307D1C00CCE9CF /* SuffixArrayTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +34,7 @@
 		D1708F7B1E2DBD6A00BD12BA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1708F831E2DBD8900BD12BA /* DC3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DC3.swift; sourceTree = "<group>"; };
 		D1708F851E2DBF9D00BD12BA /* words.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = words.txt; sourceTree = "<group>"; };
+		D1B5C8911E307D1C00CCE9CF /* SuffixArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuffixArrayTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				D1708F851E2DBF9D00BD12BA /* words.txt */,
+				D1B5C8911E307D1C00CCE9CF /* SuffixArrayTests.swift */,
 				D1708F791E2DBD6A00BD12BA /* DC3Tests.swift */,
 				D1708F7B1E2DBD6A00BD12BA /* Info.plist */,
 			);
@@ -212,6 +215,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1B5C8921E307D1C00CCE9CF /* SuffixArrayTests.swift in Sources */,
 				D1708F7A1E2DBD6A00BD12BA /* DC3Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -425,6 +429,7 @@
 				D1708F7F1E2DBD6A00BD12BA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D1708F801E2DBD6A00BD12BA /* Build configuration list for PBXNativeTarget "DC3Tests" */ = {
 			isa = XCConfigurationList;
@@ -433,6 +438,7 @@
 				D1708F821E2DBD6A00BD12BA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
