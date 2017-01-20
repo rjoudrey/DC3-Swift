@@ -218,23 +218,18 @@ func suffixArrayPart1_5(part1: SuffixArrayPart1Output) -> SuffixArrayPart1_5Outp
 
 func suffixArrayPart1_7(part1_5: SuffixArrayPart1_5Output, C: [Int], count: Int) -> SuffixArrayPart1_7Output {
     var ranksOfSi = [Int?](repeating: nil, count: count) + [0, 0]
-    var rank = 0
-    for i in part1_5.sortedIndicesOfR {
-        defer {
-            rank = rank + 1
-        }
-        if i == C.endIndex {
-            continue
-        }
-        let j = C[i]
-        ranksOfSi[j] = rank
+    var rank = 1
+    for indexR in part1_5.sortedIndicesOfR {
+        let i = convertFromIndexOfR(indexR)
+        ranksOfSi[i] = rank
+        rank += 1
     }
     return SuffixArrayPart1_7Output(ranksOfSi: ranksOfSi)
 }
 
 // (ti, rank(Si+1))
 struct SuffixArrayPart2Output {
-    var ranksOfSj: [Int?]
+    var sortedIndicesOfSB0: [Int]
 }
 
 // Sort nonsample suffixes
@@ -248,60 +243,71 @@ func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]
         }
         return 0
     })
-    var ranksOfSj = [Int?](repeating: nil, count: input.count) + [0, 0]
-    var rank = 1
-    for i in sortedIndicesOfSB0 {
-        let index = B0[i]
-        ranksOfSj[index] = rank
-        rank += 1
+    return SuffixArrayPart2Output(sortedIndicesOfSB0: sortedIndicesOfSB0)
+}
+
+func convertFromIndexOfR(_ i: Int) -> Int {
+    if i == 0 {
+        return 1
+    } else {
+        return 2 * i - (i - 1) / 2
     }
-    return SuffixArrayPart2Output(ranksOfSj: ranksOfSj)
 }
 
 // Merge suffixes
-func suffixArrayPart3(input: [Int], ranksSi: [Int?], ranksSj: [Int?]) -> [Int] {
-    var ranks = ranksSj.map { _ in 0 }
-    for (i, r) in ranksSi.enumerated() {
-        if let r = r {
-            ranks[i] = r
-        }
-    }
-    for (i, r) in ranksSj.enumerated() {
-        if let r = r {
-            ranks[i] = r
-        }
-    }
-
+func suffixArrayPart3(input: [Int], ranks: [Int?], sortedIndicesOfR: [Int], sortedIndicesOfSB0: [Int]) -> [Int] {
     var sortedIndices = [Int]()
-    var i = 1 // 1, 2, 4, 5, ...
-    var j = 0 // 0, 3, 6, 9, ...
 
-    while i != input.endIndex && j != input.endIndex {
+    var iteratorR = sortedIndicesOfR.makeIterator()
+    var iteratorSB0 = sortedIndicesOfSB0.makeIterator()
+
+    var _indexR = iteratorR.next()
+    var _indexSB0 = iteratorSB0.next()
+
+    while let indexR = _indexR, let indexSB0 = _indexSB0 {
+        // convert index of SB0 into an index of the input array
+        let i = convertFromIndexOfR(indexR)
+        let j = 3 * indexSB0
+
         let lessThan: Bool
         switch i % 3 {
         case 1: // i is in B1
-            lessThan = (input[i], ranks[i + 1]) <= (input[j], ranks[j + 1])
+            lessThan = (input[i], ranks[i + 1]!) <= (input[j], ranks[j + 1]!)
         case 2: // i is in B2
-            lessThan = (input[i], input[i + 1], ranks[i + 2]) <= (input[j], input[j + 1], ranks[j + 2])
+            lessThan = (input[i], input[i + 1], ranks[i + 2]!) <= (input[j], input[j + 1], ranks[j + 2]!)
         default:
             fatalError()
         }
         // suffix[i] is less than suffix[j], so increment i
         if lessThan {
             sortedIndices.append(i)
-            switch i % 3 {
-            case 1:
-                i = i + 1
-            case 2:
-                i = i + 2
-            default:
-                fatalError()
-            }
+            _indexR = iteratorR.next()
         } else {
             sortedIndices.append(j)
-            j = min(input.endIndex, j + 3)
+            _indexSB0 = iteratorSB0.next()
         }
     }
+
+    if let indexR = _indexR {
+        let i = convertFromIndexOfR(indexR)
+        sortedIndices.append(i)
+    }
+
+    while let indexR = iteratorR.next() {
+        let i = convertFromIndexOfR(indexR)
+        sortedIndices.append(i)
+    }
+
+    if let indexSB0 = _indexSB0 {
+        let j = 3 * indexSB0
+        sortedIndices.append(j)
+    }
+
+    while let indexSB0 = iteratorSB0.next() {
+        let j = 3 * indexSB0
+        sortedIndices.append(j)
+    }
+
     return sortedIndices
 }
 
