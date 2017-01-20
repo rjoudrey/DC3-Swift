@@ -1,7 +1,7 @@
 import XCTest
 @testable import DC3
 
-class SuffixArrayTests: XCTestCase {
+class TestSuffixArray: XCTestCase {
     var suffixArrayInput = "yabbadabbado0".utf8.map { Int($0) }
 
     func toChars(ints: [Int]) -> String {

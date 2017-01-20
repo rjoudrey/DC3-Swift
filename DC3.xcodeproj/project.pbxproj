@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D1384C3B1E31D07A0018D9B3 /* TestBucketSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1384C3A1E31D07A0018D9B3 /* TestBucketSort.swift */; };
+		D1384C3D1E31D0840018D9B3 /* TestRadixSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1384C3C1E31D0840018D9B3 /* TestRadixSort.swift */; };
+		D1384C3F1E31D0EE0018D9B3 /* IntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1384C3E1E31D0EE0018D9B3 /* IntegrationTests.swift */; };
 		D1708F751E2DBD6A00BD12BA /* DC3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1708F6C1E2DBD6A00BD12BA /* DC3.framework */; };
-		D1708F7A1E2DBD6A00BD12BA /* DC3Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1708F791E2DBD6A00BD12BA /* DC3Tests.swift */; };
+		D1708F7A1E2DBD6A00BD12BA /* TestRanks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1708F791E2DBD6A00BD12BA /* TestRanks.swift */; };
 		D1708F7C1E2DBD6A00BD12BA /* DC3.h in Headers */ = {isa = PBXBuildFile; fileRef = D1708F6E1E2DBD6A00BD12BA /* DC3.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D1708F841E2DBD8900BD12BA /* DC3.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1708F831E2DBD8900BD12BA /* DC3.swift */; };
 		D1708F861E2DBF9D00BD12BA /* words.txt in Resources */ = {isa = PBXBuildFile; fileRef = D1708F851E2DBF9D00BD12BA /* words.txt */; };
-		D1B5C8921E307D1C00CCE9CF /* SuffixArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B5C8911E307D1C00CCE9CF /* SuffixArrayTests.swift */; };
+		D1B5C8921E307D1C00CCE9CF /* TestSuffixArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B5C8911E307D1C00CCE9CF /* TestSuffixArray.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,15 +29,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D1384C3A1E31D07A0018D9B3 /* TestBucketSort.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestBucketSort.swift; sourceTree = "<group>"; };
+		D1384C3C1E31D0840018D9B3 /* TestRadixSort.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestRadixSort.swift; sourceTree = "<group>"; };
+		D1384C3E1E31D0EE0018D9B3 /* IntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntegrationTests.swift; sourceTree = "<group>"; };
 		D1708F6C1E2DBD6A00BD12BA /* DC3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DC3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1708F6E1E2DBD6A00BD12BA /* DC3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DC3.h; sourceTree = "<group>"; };
 		D1708F6F1E2DBD6A00BD12BA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1708F741E2DBD6A00BD12BA /* DC3Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DC3Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1708F791E2DBD6A00BD12BA /* DC3Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DC3Tests.swift; sourceTree = "<group>"; };
+		D1708F791E2DBD6A00BD12BA /* TestRanks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRanks.swift; sourceTree = "<group>"; };
 		D1708F7B1E2DBD6A00BD12BA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1708F831E2DBD8900BD12BA /* DC3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DC3.swift; sourceTree = "<group>"; };
 		D1708F851E2DBF9D00BD12BA /* words.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = words.txt; sourceTree = "<group>"; };
-		D1B5C8911E307D1C00CCE9CF /* SuffixArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuffixArrayTests.swift; sourceTree = "<group>"; };
+		D1B5C8911E307D1C00CCE9CF /* TestSuffixArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestSuffixArray.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,10 +93,13 @@
 		D1708F781E2DBD6A00BD12BA /* DC3Tests */ = {
 			isa = PBXGroup;
 			children = (
-				D1708F851E2DBF9D00BD12BA /* words.txt */,
-				D1B5C8911E307D1C00CCE9CF /* SuffixArrayTests.swift */,
-				D1708F791E2DBD6A00BD12BA /* DC3Tests.swift */,
 				D1708F7B1E2DBD6A00BD12BA /* Info.plist */,
+				D1384C3E1E31D0EE0018D9B3 /* IntegrationTests.swift */,
+				D1384C3A1E31D07A0018D9B3 /* TestBucketSort.swift */,
+				D1384C3C1E31D0840018D9B3 /* TestRadixSort.swift */,
+				D1708F791E2DBD6A00BD12BA /* TestRanks.swift */,
+				D1B5C8911E307D1C00CCE9CF /* TestSuffixArray.swift */,
+				D1708F851E2DBF9D00BD12BA /* words.txt */,
 			);
 			path = DC3Tests;
 			sourceTree = "<group>";
@@ -215,8 +224,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1B5C8921E307D1C00CCE9CF /* SuffixArrayTests.swift in Sources */,
-				D1708F7A1E2DBD6A00BD12BA /* DC3Tests.swift in Sources */,
+				D1B5C8921E307D1C00CCE9CF /* TestSuffixArray.swift in Sources */,
+				D1708F7A1E2DBD6A00BD12BA /* TestRanks.swift in Sources */,
+				D1384C3F1E31D0EE0018D9B3 /* IntegrationTests.swift in Sources */,
+				D1384C3D1E31D0840018D9B3 /* TestRadixSort.swift in Sources */,
+				D1384C3B1E31D07A0018D9B3 /* TestBucketSort.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
