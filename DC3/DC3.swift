@@ -145,9 +145,6 @@ extension Collection {
 }
 
 struct SuffixArrayPart0Output {
-    let B1: [Int]
-    let B2: [Int]
-    let C: [Int]
     let R: [[Int]]
 }
 
@@ -179,8 +176,7 @@ func suffixArrayPart0(input: [Int]) -> SuffixArrayPart0Output {
         let j = Swift.min(i + 3, input.endIndex)
         return Array(input[i ..< j])
     }
-    // print(SC.map { String($0.map { Character(UnicodeScalar($0)!) }) })
-    return SuffixArrayPart0Output(B1: B1, B2: B2, C: C, R: R)
+    return SuffixArrayPart0Output(R: R)
 }
 
 // Sort sample suffixes
@@ -207,16 +203,14 @@ func suffixArrayPart1_5(part1: SuffixArrayPart1Output) -> SuffixArrayPart1_5Outp
     let sortedIndicesOfR: [Int]
     if part1.sortedRanksOfR.adjacentDuplicateExists(areEqual: ==) {
         // there is a non-unique character in RPrime
-        // sortedIndicesOfR = part1.ranksOfR.suffixArray()
-        sortedIndicesOfR = []
-        // todo: fix this
+        sortedIndicesOfR = suffixArray(input: part1.ranksOfR)
     } else {
         sortedIndicesOfR = part1.sortedRanksOfR.map { $0 - 1 }
     }
     return SuffixArrayPart1_5Output(sortedIndicesOfR: sortedIndicesOfR)
 }
 
-func suffixArrayPart1_7(part1_5: SuffixArrayPart1_5Output, C: [Int], count: Int) -> SuffixArrayPart1_7Output {
+func suffixArrayPart1_7(part1_5: SuffixArrayPart1_5Output, count: Int) -> SuffixArrayPart1_7Output {
     var ranksOfSi = [Int?](repeating: nil, count: count) + [0, 0]
     var rank = 1
     for indexR in part1_5.sortedIndicesOfR {
@@ -233,7 +227,8 @@ struct SuffixArrayPart2Output {
 }
 
 // Sort nonsample suffixes
-func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int], B0: [Int]) -> SuffixArrayPart2Output {
+func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int]) -> SuffixArrayPart2Output {
+    let B0 = stride(from: 0, to: input.count, by: 3)
     let pairs = B0.map { i in
         [input[i], part1_7.ranksOfSi[i + 1]!]
     }
@@ -311,3 +306,17 @@ func suffixArrayPart3(input: [Int], ranks: [Int?], sortedIndicesOfR: [Int], sort
     return sortedIndices
 }
 
+func suffixArray(input: [Int]) -> [Int] {
+    let part0 = suffixArrayPart0(input: input)
+    let part1 = suffixArrayPart1(part0: part0)
+    let part1_5 = suffixArrayPart1_5(part1: part1)
+    let part1_7 = suffixArrayPart1_7(part1_5: part1_5, count: input.count)
+    let part2 = suffixArrayPart2(part1_7: part1_7, input: input)
+    let part3 = suffixArrayPart3(
+        input: input,
+        ranks: part1_7.ranksOfSi,
+        sortedIndicesOfR: part1_5.sortedIndicesOfR,
+        sortedIndicesOfSB0: part2.sortedIndicesOfSB0
+    )
+    return part3
+}

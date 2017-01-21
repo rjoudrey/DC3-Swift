@@ -15,9 +15,6 @@ class TestSuffixArray: XCTestCase {
     var expectedPart0Output: SuffixArrayPart0Output {
         let R = ["abb", "ada", "bba", "do0", "bba", "dab", "bad", "o0"].map(toInts)
         let output = SuffixArrayPart0Output(
-            B1: [1, 4, 7, 10],
-            B2: [2, 5, 8, 11],
-            C: [1, 4, 7, 10, 2, 5, 8, 11],
             R: R
         )
         return output
@@ -27,9 +24,6 @@ class TestSuffixArray: XCTestCase {
         let input = suffixArrayInput
         let actual = suffixArrayPart0(input: input)
         let expected = expectedPart0Output
-        XCTAssertEqual(actual.B1, expected.B1)
-        XCTAssertEqual(actual.B2, expected.B2)
-        XCTAssertEqual(actual.C, expected.C)
         XCTAssertTrue(actual.R.elementsEqual(expected.R, by: ==))
     }
 
@@ -52,6 +46,13 @@ class TestSuffixArray: XCTestCase {
         sortedIndicesOfR: [0, 2, 5, 1, 4, 3, 6, 7]
     )
 
+    func testSuffixArrayPart1_5() {
+        let input = expectedPart1Output
+        let actual = suffixArrayPart1_5(part1: input)
+        let expected = expectedPart1_5Output
+        XCTAssertEqual(actual.sortedIndicesOfR, expected.sortedIndicesOfR)
+    }
+
     var expectedSuffixArrayPart1_7Output: SuffixArrayPart1_7Output {
         return SuffixArrayPart1_7Output(
             ranksOfSi: [nil, 1, 4, nil, 2, 6, nil, 5, 3, nil, 7, 8, nil, 0, 0]
@@ -60,7 +61,7 @@ class TestSuffixArray: XCTestCase {
 
     func testSuffixArrayPart1_7() {
         let input = expectedPart1_5Output
-        let actual = suffixArrayPart1_7(part1_5: input, C: expectedPart0Output.C, count: suffixArrayInput.count)
+        let actual = suffixArrayPart1_7(part1_5: input, count: suffixArrayInput.count)
         let expected = expectedSuffixArrayPart1_7Output.ranksOfSi
         XCTAssertTrue(actual.ranksOfSi.elementsEqual(expected, by: ==))
     }
@@ -71,7 +72,7 @@ class TestSuffixArray: XCTestCase {
 
     func testSuffixArrayPart2() {
         let part1_7Output = expectedSuffixArrayPart1_7Output
-        let actual = suffixArrayPart2(part1_7: part1_7Output, input: suffixArrayInput, B0: [0, 3, 6, 9, 12])
+        let actual = suffixArrayPart2(part1_7: part1_7Output, input: suffixArrayInput)
         let expected = expectedSuffixArrayPart2Output
         XCTAssertEqual(actual.sortedIndicesOfSB0, expected.sortedIndicesOfSB0)
     }

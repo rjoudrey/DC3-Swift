@@ -2,7 +2,7 @@ import XCTest
 @testable import DC3
 
 class IntegrationTests: XCTestCase {
-    /*func testSuffixArray () {
+    func testSuffixArray () {
         let bundle = Bundle(for: type(of: self))
         let url = bundle.url(forResource: "words", withExtension: "txt")!
         let wordList = try! String(contentsOf: url)
@@ -19,7 +19,7 @@ class IntegrationTests: XCTestCase {
             let chars = Array(word.utf8).map {
                 Int($0)
             }
-            let actualSortedIndices = chars.suffixArray()
+            let actualSortedIndices = suffixArray(input: chars)
             let expectationIsTrue = actualSortedIndices.elementsEqual(expectedSortedIndices)
             XCTAssertTrue(
                 expectationIsTrue,
@@ -33,5 +33,5 @@ class IntegrationTests: XCTestCase {
             }
             numberOfSuccesses += 1
         }
-    }*/
+    }
 }
