@@ -42,7 +42,7 @@ class TestSuffixArray: XCTestCase {
     }
 
     var expectedPart1_5Output = SuffixArrayPart1_5Output(
-        sortedIndicesOfR: [0, 2, 5, 1, 4, 3, 6, 7]
+        sortedIndicesOfR: [0, 1, 6, 4, 2, 5, 3, 7]
     )
 
     func testSuffixArrayPart1_5() {
