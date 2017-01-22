@@ -164,7 +164,19 @@ func suffixArrayPart3(input: [Int], ranks: [Int?], sortedIndicesOfR: [Int], sort
     return sortedIndices
 }
 
-func suffixArray(input: [Int]) -> [Int] {
+func suffixArray(input _input: [Int]) -> [Int] {
+    let input: [Int]
+    // pad the input by appending zeroes if necessary so that input.count = 3k
+    do {
+        let count = _input.count
+        let countMod3 = count % 3
+        if countMod3 == 0 {
+            input = _input
+        } else {
+            let numZerosToAdd = 3 - countMod3
+            input = _input + [Int](repeating: 0, count: numZerosToAdd)
+        }
+    }
     let part0 = suffixArrayPart0(input: input)
     let part1 = suffixArrayPart1(part0: part0)
     let part1_5 = suffixArrayPart1_5(part1: part1)
@@ -176,5 +188,8 @@ func suffixArray(input: [Int]) -> [Int] {
         sortedIndicesOfR: part1_5.sortedIndicesOfR,
         sortedIndicesOfSB0: part2.sortedIndicesOfSB0
     )
-    return part3
+    // filter out indices referring to pad elements
+    return part3.filter {
+        _input.indices.contains($0)
+    }
 }
