@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D1157B7B1E344D6200A4426E /* TestSuffixArrayAlt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1157B7A1E344D6200A4426E /* TestSuffixArrayAlt.swift */; };
 		D1384C3B1E31D07A0018D9B3 /* TestBucketSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1384C3A1E31D07A0018D9B3 /* TestBucketSort.swift */; };
 		D1384C3D1E31D0840018D9B3 /* TestRadixSort.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1384C3C1E31D0840018D9B3 /* TestRadixSort.swift */; };
 		D1384C3F1E31D0EE0018D9B3 /* IntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1384C3E1E31D0EE0018D9B3 /* IntegrationTests.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D1157B7A1E344D6200A4426E /* TestSuffixArrayAlt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestSuffixArrayAlt.swift; sourceTree = "<group>"; };
 		D1384C3A1E31D07A0018D9B3 /* TestBucketSort.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestBucketSort.swift; sourceTree = "<group>"; };
 		D1384C3C1E31D0840018D9B3 /* TestRadixSort.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestRadixSort.swift; sourceTree = "<group>"; };
 		D1384C3E1E31D0EE0018D9B3 /* IntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntegrationTests.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 		D1708F781E2DBD6A00BD12BA /* DC3Tests */ = {
 			isa = PBXGroup;
 			children = (
+				D1157B7A1E344D6200A4426E /* TestSuffixArrayAlt.swift */,
 				D1F820FA1E33271600FA5574 /* TestSuffixArrayRound2.swift */,
 				D1708F7B1E2DBD6A00BD12BA /* Info.plist */,
 				D1384C3E1E31D0EE0018D9B3 /* IntegrationTests.swift */,
@@ -244,6 +247,7 @@
 				D1384C3F1E31D0EE0018D9B3 /* IntegrationTests.swift in Sources */,
 				D1384C3D1E31D0840018D9B3 /* TestRadixSort.swift in Sources */,
 				D1F820FB1E33271600FA5574 /* TestSuffixArrayRound2.swift in Sources */,
+				D1157B7B1E344D6200A4426E /* TestSuffixArrayAlt.swift in Sources */,
 				D1384C3B1E31D07A0018D9B3 /* TestBucketSort.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

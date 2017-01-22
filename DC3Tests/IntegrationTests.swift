@@ -8,7 +8,6 @@ class IntegrationTests: XCTestCase {
         let wordList = try! String(contentsOf: url)
         let words = wordList.components(separatedBy: .newlines)
         var numberOfSuccesses = 0
-        // TODO: Test aaa
         for word in words {
             let suffixes = word.characters.indices.map {
                 String(word.characters.suffix(from: $0))
@@ -28,10 +27,10 @@ class IntegrationTests: XCTestCase {
                     "\nGot:      \(actualSortedIndices)" +
                 "\nNumber of successes: \(numberOfSuccesses)"
             )
-            if !expectationIsTrue {
-                return
+            if expectationIsTrue {
+                numberOfSuccesses += 1
             }
-            numberOfSuccesses += 1
         }
+        print("\(numberOfSuccesses) / \(words.count) successes")
     }
 }

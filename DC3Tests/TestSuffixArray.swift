@@ -1,16 +1,16 @@
 import XCTest
 @testable import DC3
 
+func toChars(ints: [Int]) -> String {
+    return String(ints.map { Character(UnicodeScalar($0)!) })
+}
+
+func toInts(string: String) -> [Int] {
+    return string.utf8.map { Int($0) }
+}
+
 class TestSuffixArray: XCTestCase {
     var suffixArrayInput = "yabbadabbado0".utf8.map { Int($0) }
-
-    func toChars(ints: [Int]) -> String {
-        return String(ints.map { Character(UnicodeScalar($0)!) })
-    }
-
-    func toInts(string: String) -> [Int] {
-        return string.utf8.map { Int($0) }
-    }
 
     var expectedPart0Output: SuffixArrayPart0Output {
         let R = ["abb", "ada", "bba", "do0", "bba", "dab", "bad", "o0"].map(toInts)
@@ -39,6 +39,7 @@ class TestSuffixArray: XCTestCase {
         let expected = expectedPart1Output
         XCTAssertEqual(actual.ranksOfR, expected.ranksOfR)
         XCTAssertEqual(actual.sortedRanksOfR, expected.sortedRanksOfR)
+        XCTAssertEqual(actual.sortedIndicesOfR, actual.sortedIndicesOfR)
     }
 
     var expectedPart1_5Output = SuffixArrayPart1_5Output(

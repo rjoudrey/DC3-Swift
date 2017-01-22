@@ -1,36 +1,29 @@
 import XCTest
 @testable import DC3
 
-class TestSuffixArrayRound2: XCTestCase {
-            //   0, 1, 2, 3, 4, 5, 6, 7
-    let input = [1, 2, 4, 6, 4, 5, 3, 7]
+class TestSuffixArrayAlt: XCTestCase {
+    let input = "insense".utf8.map { Int($0) }
 
     let part0Output = SuffixArrayPart0Output(
-        R: [
-            [2, 4, 6],
-            [4, 5, 3],
-            [7],
-            [4, 6, 4],
-            [5, 3, 7]
-        ]
+        R: ["nse", "nse", "sen", "se"].map(toInts)
     )
 
     let part1Output = SuffixArrayPart1Output(
-        ranksOfR: [1, 2, 5, 3, 4],
-        sortedIndicesOfR: [0, 1, 3, 4, 2],
-        sortedRanksOfR: [1, 2, 3, 4, 5]
+        ranksOfR: [1, 1, 3, 2],
+        sortedIndicesOfR: [0, 1, 3, 2],
+        sortedRanksOfR: [1, 1, 2, 3]
     )
 
     let part1_5Output = SuffixArrayPart1_5Output(
-        sortedIndicesOfR: [0, 1, 3, 4, 2]
+        sortedIndicesOfR: [0, 1, 3, 2]
     )
 
     let part1_7Output = SuffixArrayPart1_7Output(
-        ranksOfSi: [nil, 1, 3, nil, 2, 4, nil, 5, 0, 0]
+        ranksOfSi: [nil, 1, 4, nil, 2, 3, nil, 0, 0]
     )
 
     let part2Output = SuffixArrayPart2Output(
-        sortedIndicesOfSB0: [0, 2, 1]
+        sortedIndicesOfSB0: [2, 1, 0]
     )
 
     func testPart0() {
@@ -72,7 +65,7 @@ class TestSuffixArrayRound2: XCTestCase {
             sortedIndicesOfR: part1_5Output.sortedIndicesOfR,
             sortedIndicesOfSB0: part2Output.sortedIndicesOfSB0
         )
-        let expected = [0, 1, 6, 4, 2, 5, 3, 7]
+        let expected = [6, 3, 0, 4, 1, 5, 2]
         XCTAssertEqual(actual, expected)
     }
 }
