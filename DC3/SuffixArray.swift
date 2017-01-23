@@ -58,7 +58,7 @@ func suffixArrayPart1(part0: SuffixArrayPart0Output) -> SuffixArrayPart1Output {
 func suffixArrayPart1_5(part1: SuffixArrayPart1Output) -> SuffixArrayPart1_5Output {
     let sortedIndicesOfR: [Int]
     if part1.sortedRanksOfR.adjacentDuplicateExists(areEqual: ==) {
-        // there is a non-unique character in RPrime
+        // there is a duplicate rank, so we need to sort the ranks
         sortedIndicesOfR = suffixArray(input: part1.ranksOfR)
     } else {
         // the indices are already sorted
@@ -78,7 +78,6 @@ func suffixArrayPart1_7(part1_5: SuffixArrayPart1_5Output, count: Int) -> Suffix
     return SuffixArrayPart1_7Output(ranksOfSi: ranksOfSi)
 }
 
-// (ti, rank(Si+1))
 struct SuffixArrayPart2Output {
     var sortedIndicesOfSB0: [Int]
 }
@@ -171,7 +170,9 @@ func suffixArrayPart3(input: [Int], ranks: [Int?], sortedIndicesOfR: [Int], sort
 
 func suffixArray(input _input: [Int]) -> [Int] {
     let input: [Int]
-    // pad the input by appending zeroes if necessary so that input.count = 3k
+    // Pad the input by appending zeroes if necessary so that input.count = 3k
+    // If we don't do this, there are some special cases where suffixArray(ranksOfR)
+    // will not work (e.g. in 'insense', 'nsense' will be sorted before "nse")
     do {
         let count = _input.count
         let countMod3 = count % 3
