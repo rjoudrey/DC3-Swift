@@ -98,13 +98,18 @@ func suffixArrayPart2(part1_7: SuffixArrayPart1_7Output, input: [Int]) -> Suffix
     return SuffixArrayPart2Output(sortedIndicesOfSB0: sortedIndicesOfSB0)
 }
 
-// TODO: Make this performant
 func convertFromIndexOfR(_ i: Int, count: Int) -> Int {
-    let indices = (0 ..< count)
-    let B1 = indices.filter { $0 % 3 == 1 }
-    let B2 = indices.filter { $0 % 3 == 2 }
-    let C = B1 + B2
-    return C[i]
+    guard count % 3 == 0 else {
+        fatalError("Count must be divisible by 3")
+    }
+    let cSize = count - count / 3
+    let halfCSize = cSize / 2
+    if i < halfCSize {
+        return 3 * i + 1
+    }
+    else {
+        return 3 * (i - halfCSize) + 2
+    }
 }
 
 // Merge suffixes
