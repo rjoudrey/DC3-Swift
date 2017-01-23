@@ -10,10 +10,10 @@ func toInts(string: String) -> [Int] {
 }
 
 class TestSuffixArray: XCTestCase {
-    var suffixArrayInput = "yabbadabbado0".utf8.map { Int($0) }
+    var suffixArrayInput = "yabbadabbado".utf8.map { Int($0) }
 
     var expectedPart0Output: SuffixArrayPart0Output {
-        let R = ["abb", "ada", "bba", "do0", "bba", "dab", "bad", "o0"].map(toInts)
+        let R = ["abb", "ada", "bba", "do", "bba", "dab", "bad", "o"].map(toInts)
         let output = SuffixArrayPart0Output(
             R: R
         )
@@ -55,7 +55,7 @@ class TestSuffixArray: XCTestCase {
 
     var expectedSuffixArrayPart1_7Output: SuffixArrayPart1_7Output {
         return SuffixArrayPart1_7Output(
-            ranksOfSi: [nil, 1, 4, nil, 2, 6, nil, 5, 3, nil, 7, 8, nil, 0, 0]
+            ranksOfSi: [nil, 1, 4, nil, 2, 6, nil, 5, 3, nil, 7, 8, 0, 0]
         )
     }
 
@@ -67,7 +67,7 @@ class TestSuffixArray: XCTestCase {
     }
 
     var expectedSuffixArrayPart2Output = SuffixArrayPart2Output(
-        sortedIndicesOfSB0: [4, 2, 3, 1, 0]
+        sortedIndicesOfSB0: [2, 3, 1, 0]
     )
 
     func testSuffixArrayPart2() {
@@ -78,8 +78,9 @@ class TestSuffixArray: XCTestCase {
     }
 
     func testConvertFromIndexOfR() {
-        let actual =   [0, 1, 2, 3, 4, 5, 6, 7].map { convertFromIndexOfR($0, count: suffixArrayInput.count) }
-        let expected = [1, 4, 7, 10, 2, 5, 8, 11]
+        let indices =  [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        let actual =   [0, 1, 2, 3, 4, 5].map { convertFromIndexOfR($0, count: indices.count) }
+        let expected = [1, 4, 7, 2, 5, 8]
         XCTAssertEqual(actual, expected)
     }
 
@@ -90,7 +91,7 @@ class TestSuffixArray: XCTestCase {
             sortedIndicesOfR: expectedPart1_5Output.sortedIndicesOfR,
             sortedIndicesOfSB0: expectedSuffixArrayPart2Output.sortedIndicesOfSB0
         )
-        let expected = [12, 1, 6, 4, 9, 3, 8, 2, 7, 5, 10, 11, 0]
+        let expected = [1, 6, 4, 9, 3, 8, 2, 7, 5, 10, 11, 0]
         XCTAssertEqual(actual, expected)
     }
 }
